@@ -1,52 +1,50 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly;
+namespace Hansel23\Tooly;
 
 use Composer\Script\Event;
-use Tooly\Script\Configuration;
-use Tooly\Script\Helper;
-use Tooly\Script\Helper\Filesystem;
-use Tooly\Script\Helper\Downloader;
-use Tooly\Script\Helper\Verifier;
-use Tooly\Script\Mode;
-use Tooly\Script\Processor;
+use Hansel23\Tooly\Script\Configuration;
+use Hansel23\Tooly\Script\Helper;
+use Hansel23\Tooly\Script\Helper\Downloader;
+use Hansel23\Tooly\Script\Helper\Filesystem;
+use Hansel23\Tooly\Script\Helper\Verifier;
+use Hansel23\Tooly\Script\Mode;
+use Hansel23\Tooly\Script\Processor;
 use TM\GPG\Verification\Verifier as GPGVerifier;
 
-/**
- * @package Tooly
- */
 class ScriptHandler
 {
-    /**
-     * @param Event $event
-     */
-    public static function installPharTools(Event $event)
-    {
-        $gpgVerifier = null;
-        $mode = new Mode;
+	public static function installPharTools( Event $event ): void
+	{
+		$gpgVerifier = null;
+		$mode        = new Mode;
 
-        if (false === $event->isDevMode()) {
-            $mode->setNoDev();
-        }
+		if ( false === $event->isDevMode() )
+		{
+			$mode->setNoDev();
+		}
 
-        if (false === $event->getIO()->isInteractive()) {
-            $mode->setNonInteractive();
-        }
+		if ( false === $event->getIO()->isInteractive() )
+		{
+			$mode->setNonInteractive();
+		}
 
-        $configuration = new Configuration($event->getComposer(), $mode);
+		$configuration = new Configuration( $event->getComposer(), $mode );
 
-        if (true === class_exists(GPGVerifier::class)) {
-            $gpgVerifier = new GPGVerifier;
-        }
+		if ( true === class_exists( GPGVerifier::class ) )
+		{
+			$gpgVerifier = new GPGVerifier;
+		}
 
-        $helper = new Helper(new Filesystem, new Downloader, new Verifier($gpgVerifier));
-        $processor = new Processor($event->getIO(), $helper, $configuration);
+		$helper    = new Helper( new Filesystem, new Downloader, new Verifier( $gpgVerifier ) );
+		$processor = new Processor( $event->getIO(), $helper, $configuration );
 
-        $processor->cleanUp();
+		$processor->cleanUp();
 
-        foreach ($configuration->getTools() as $tool) {
-            $processor->process($tool);
-            $processor->symlinkOrCopy($tool);
-        }
-    }
+		foreach ( $configuration->getTools() as $tool )
+		{
+			$processor->process( $tool );
+			$processor->symlinkOrCopy( $tool );
+		}
+	}
 }

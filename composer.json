@@ -1,6 +1,6 @@
 {
   "name": "hansel23/tooly-composer-script",
-  "description": "Simple composer script to manage phar files.",
+  "description": "Fork of tommy-muehle/tooly-composer-script. Simple composer script to manage phar files.",
   "keywords": [
     "composer",
     "composer-script",
@@ -26,50 +26,43 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Tooly\\": "src/"
+      "Hansel23\\Tooly\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Tooly\\": "src/",
-      "Tooly\\Tests\\": "tests/"
+      "Hansel23\\Tooly\\": "src/",
+      "Hansel23\\Tooly\\Tests\\": "tests/"
     }
   },
   "require": {
-    "php": ">=5.6.0"
+    "php": ">=8.1.0"
   },
   "suggest": {
     "tm/gpg-verifier": "Allows verification over GPG for PHAR tools."
   },
   "require-dev": {
-    "composer/composer": "1.*",
-    "symfony/console": "^3.0",
-    "mikey179/vfsstream": "1.6.*",
-    "php-mock/php-mock-phpunit": "1.1.*"
+    "roave/security-advisories": "dev-latest",
+    "composer/composer": "^2.0.0",
+    "symfony/console": "^6.0.0",
+    "mikey179/vfsstream": "1.6.*"
   },
   "scripts": {
-    "post-install-cmd": "Tooly\\ScriptHandler::installPharTools",
-    "post-update-cmd": "Tooly\\ScriptHandler::installPharTools"
+    "post-install-cmd": "Hansel23\\Tooly\\ScriptHandler::installPharTools",
+    "post-update-cmd": "Hansel23\\Tooly\\ScriptHandler::installPharTools"
   },
   "extra": {
     "tools": {
       "phpunit": {
-        "url": "https://phar.phpunit.de/phpunit-5.7.27.phar"
+        "url": "https://phar.phpunit.de/phpunit-9.phar",
+        "only-dev": true,
+        "force-replace": true
       },
       "phpcpd": {
         "url": "https://phar.phpunit.de/phpcpd-2.0.4.phar"
       },
       "phpcs": {
         "url": "https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar",
-        "force-replace": true
-      },
-      "phpmd": {
-        "url": "http://static.phpmd.org/php/latest/phpmd.phar",
-        "fallback-url": "https://github.com/jakzal/phpmd/releases/download/2.6.0-jakzal-2/phpmd.phar",
-        "force-replace": true
-      },
-      "security-checker": {
-        "url": "http://get.sensiolabs.org/security-checker.phar",
         "force-replace": true
       }
     }

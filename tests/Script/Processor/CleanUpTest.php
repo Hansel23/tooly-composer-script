@@ -1,96 +1,92 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Tests\Script\Processor;
+namespace Hansel23\Tooly\Tests\Script\Processor;
 
 use Composer\IO\ConsoleIO;
-use Composer\Util\Silencer;
+use Hansel23\Tooly\Script\Configuration;
+use Hansel23\Tooly\Script\Helper;
+use Hansel23\Tooly\Script\Processor;
 use org\bovigo\vfs\vfsStream;
-use Tooly\Script\Configuration;
-use Tooly\Script\Helper;
-use Tooly\Script\Processor;
-use Tooly\Script\Helper\Filesystem;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @package Tooly\Tests\Script
- */
-class CleanupTest extends \PHPUnit_Framework_TestCase
+class CleanUpTest extends TestCase
 {
-    private $configuration;
+	private Configuration|\PHPUnit\Framework\MockObject\MockObject $configuration;
 
-    private $helper;
+	private Helper|\PHPUnit\Framework\MockObject\MockObject        $helper;
 
-    private $root;
+	private \org\bovigo\vfs\vfsStreamDirectory                     $root;
 
-    public function setUp()
-    {
-        $this->root = vfsStream::setup();
+	public function setUp(): void
+	{
+		$this->root = vfsStream::setup();
 
-        mkdir(vfsStream::url('root/vendor/bin'), 0777, true);
-        mkdir(vfsStream::url('root/bin'));
+		mkdir( vfsStream::url( 'root/vendor/bin' ), 0777, true );
+		mkdir( vfsStream::url( 'root/bin' ) );
 
-        $this->configuration = $this
-            ->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+		$this->configuration = $this
+			->getMockBuilder( Configuration::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $this->configuration
-            ->method('getComposerBinDirectory')
-            ->willReturn(vfsStream::url('root/vendor/bin'));
+		$this->configuration
+			->method( 'getComposerBinDirectory' )
+			->willReturn( vfsStream::url( 'root/vendor/bin' ) );
 
-        $this->configuration
-            ->method('getBinDirectory')
-            ->willReturn(vfsStream::url('root/bin'));
+		$this->configuration
+			->method( 'getBinDirectory' )
+			->willReturn( vfsStream::url( 'root/bin' ) );
 
-        $this->helper = $this
-            ->getMockBuilder(Helper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
+		$this->helper = $this
+			->getMockBuilder( Helper::class )
+			->disableOriginalConstructor()
+			->getMock();
+	}
 
-    public function testEmptyDirectoryDoNothing()
-    {
-        $this->configuration
-            ->method('getTools')
-            ->willReturn([]);
+	public function testEmptyDirectoryDoNothing(): void
+	{
+		$this->configuration
+			->method( 'getTools' )
+			->willReturn( [] );
 
-        $this->helper
-            ->expects($this->never())
-            ->method('getFilesystem');
+		$this->helper
+			->expects( $this->never() )
+			->method( 'getFilesystem' );
 
-        $processor = $this->getProcessor();
-        $processor->cleanUp();
-    }
+		$processor = $this->getProcessor();
+		$processor->cleanUp();
+	}
 
-    public function testPharFileWasRemoved()
-    {
-        $this->root
-            ->getChild('bin')
-            ->addChild(vfsStream::newFile('tool.phar'));
+	public function testPharFileWasRemoved(): void
+	{
+		$this->root
+			->getChild( 'bin' )
+			->addChild( vfsStream::newFile( 'tool.phar' ) );
 
-        $this->configuration
-            ->method('getTools')
-            ->willReturn([]);
+		$this->configuration
+			->method( 'getTools' )
+			->willReturn( [] );
 
-        $this->helper
-            ->expects($this->never())
-            ->method('getFilesystem');
+		$this->helper
+			->expects( $this->never() )
+			->method( 'getFilesystem' );
 
-        $processor = $this->getProcessor();
-        $processor->cleanUp();
-    }
+		$processor = $this->getProcessor();
+		$processor->cleanUp();
+	}
 
-    private function getProcessor()
-    {
-        return $this
-            ->getMockBuilder(Processor::class)
-            ->setConstructorArgs([
-                $this->getMockBuilder(ConsoleIO::class)
-                    ->disableOriginalConstructor()
-                    ->getMock(),
-                $this->helper,
-                $this->configuration
-            ])
-            ->setMethodsExcept(['cleanUp'])
-            ->getMock();
-    }
+	private function getProcessor(): Processor
+	{
+		return $this
+			->getMockBuilder( Processor::class )
+			->setConstructorArgs( [
+				$this->getMockBuilder( ConsoleIO::class )
+				     ->disableOriginalConstructor()
+				     ->getMock(),
+				$this->helper,
+				$this->configuration,
+			] )
+			->onlyMethods( [ 'process', 'symlinkOrCopy' ] )
+			->getMock();
+	}
 }

@@ -1,63 +1,52 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Tests\Script\Helper;
+namespace Hansel23\Tooly\Tests\Script\Helper;
 
 use Composer\Util\Platform;
-use org\bovigo\vfs\vfsStream;
-use phpmock\phpunit\PHPMock;
-use Tooly\Script\Helper\Filesystem;
+use Hansel23\Tooly\Script\Helper\Filesystem;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @package Tooly\Tests\Script\Helper
- */
-class FilesystemTest extends \PHPUnit_Framework_TestCase
+class FilesystemTest extends TestCase
 {
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+	private Filesystem $filesystem;
 
-    /**
-     * @var string
-     */
-    private $testDirectory;
+	private string     $testDirectory;
 
-    /**
-     * @var string
-     */
-    private $testFile;
+	private string     $testFile;
 
-    public function setUp()
-    {
-        $this->filesystem = new Filesystem;
-        $this->testDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test';
-        $this->testFile = $this->testDirectory . DIRECTORY_SEPARATOR . 'file';
-    }
+	public function setUp(): void
+	{
+		$this->filesystem    = new Filesystem;
+		$this->testDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test';
+		$this->testFile      = $this->testDirectory . DIRECTORY_SEPARATOR . 'file';
+	}
 
-    public function tearDown()
-    {
-        if (is_dir($this->testDirectory)) {
-            $this->filesystem->removeDirectory($this->testDirectory);
-        }
-    }
+	public function tearDown(): void
+	{
+		if ( is_dir( $this->testDirectory ) )
+		{
+			$this->filesystem->removeDirectory( $this->testDirectory );
+		}
+	}
 
-    public function testCanRelativeSymlinkAFile()
-    {
-        if (Platform::isWindows()) {
-            $this->markTestSkipped('Symlink not possible on Windows.');
-        }
+	public function testCanRelativeSymlinkAFile(): void
+	{
+		if ( Platform::isWindows() )
+		{
+			$this->markTestSkipped( 'Symlink not possible on Windows.' );
+		}
 
-        $symlink = $this->testDirectory . DIRECTORY_SEPARATOR . '/foo/symlinkOrCopy';
+		$symlink = $this->testDirectory . DIRECTORY_SEPARATOR . '/foo/symlinkOrCopy';
 
-        $this->assertTrue($this->filesystem->symlinkFile($this->testFile, $symlink));
-        $this->assertNotEquals('/', substr(readlink($symlink), '0', 1));
-    }
+		$this->assertTrue( $this->filesystem->symlinkFile( $this->testFile, $symlink ) );
+		$this->assertNotEquals( '/', substr( readlink( $symlink ), 0, 1 ) );
+	}
 
-    public function testCanCopyAFile()
-    {
-        $copy = $this->testDirectory . DIRECTORY_SEPARATOR . 'copy';
+	public function testCanCopyAFile(): void
+	{
+		$copy = $this->testDirectory . DIRECTORY_SEPARATOR . 'copy';
 
-        $this->assertTrue($this->filesystem->createFile($this->testFile, ''));
-        $this->assertTrue($this->filesystem->copyFile($this->testFile, $copy));
-    }
+		$this->assertTrue( $this->filesystem->createFile( $this->testFile, '' ) );
+		$this->assertTrue( $this->filesystem->copyFile( $this->testFile, $copy ) );
+	}
 }

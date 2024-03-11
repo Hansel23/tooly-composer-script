@@ -1,143 +1,140 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Tests\Script\Decision;
+namespace Hansel23\Tooly\Tests\Script\Decision;
 
-use Tooly\Model\Tool;
-use Tooly\Script\Decision\FileAlreadyExistDecision;
-use Tooly\Script\Helper\Downloader;
+use Hansel23\Tooly\Model\Tool;
+use Hansel23\Tooly\Script\Decision\FileAlreadyExistDecision;
+use Hansel23\Tooly\Script\Helper\Downloader;
 
-/**
- * @package Tooly\Tests\Script\Decision
- */
 class FileAlreadyExistDecisionTest extends DecisionTestCase
 {
-    public function testIfFileIsAccessibleAndFileNotAlreadyExistReturnsTrue()
-    {
-        $downloader = $this
-            ->getMockBuilder(Downloader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+	public function testIfFileIsAccessibleAndFileNotAlreadyExistReturnsTrue(): void
+	{
+		$downloader = $this
+			->getMockBuilder( Downloader::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $downloader
-            ->expects($this->once())
-            ->method('isAccessible')
-            ->willReturn(true);
+		$downloader
+			->expects( $this->once() )
+			->method( 'isAccessible' )
+			->willReturn( true );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('getDownloader')
-            ->willReturn($downloader);
+		$this->helper
+			->expects( $this->once() )
+			->method( 'getDownloader' )
+			->willReturn( $downloader );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('isFileAlreadyExist')
-            ->willReturn(false);
+		$this->helper
+			->expects( $this->once() )
+			->method( 'isFileAlreadyExist' )
+			->willReturn( false );
 
-        $tool = $this
-            ->getMockBuilder(Tool::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+		$tool = $this
+			->getMockBuilder( Tool::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $decision = new FileAlreadyExistDecision($this->configuration, $this->helper);
-        $this->assertTrue($decision->canProceed($tool));
-    }
+		$decision = new FileAlreadyExistDecision( $this->configuration, $this->helper );
+		$this->assertTrue( $decision->canProceed( $tool ) );
+	}
 
-    public function testIfFileNotAccessibleAndFileNotAlreadyExistReturnsTrue()
-    {
-        $downloader = $this
-            ->getMockBuilder(Downloader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+	public function testIfFileNotAccessibleAndFileNotAlreadyExistReturnsTrue(): void
+	{
+		$downloader = $this
+			->getMockBuilder( Downloader::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $downloader
-            ->expects($this->once())
-            ->method('isAccessible')
-            ->willReturn(false);
+		$downloader
+			->expects( $this->once() )
+			->method( 'isAccessible' )
+			->willReturn( false );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('getDownloader')
-            ->willReturn($downloader);
+		$this->helper
+			->expects( $this->once() )
+			->method( 'getDownloader' )
+			->willReturn( $downloader );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('isFileAlreadyExist')
-            ->willReturn(false);
+		$this->helper
+			->expects( $this->once() )
+			->method( 'isFileAlreadyExist' )
+			->willReturn( false );
 
-        $tool = $this
-            ->getMockBuilder(Tool::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+		$tool = $this
+			->getMockBuilder( Tool::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $decision = new FileAlreadyExistDecision($this->configuration, $this->helper);
-        $this->assertTrue($decision->canProceed($tool));
-    }
+		$decision = new FileAlreadyExistDecision( $this->configuration, $this->helper );
+		$this->assertTrue( $decision->canProceed( $tool ) );
+	}
 
-    public function testIfFileIsAccessibleAndFileAlreadyExistReturnsFalse()
-    {
-        $downloader = $this
-            ->getMockBuilder(Downloader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+	public function testIfFileIsAccessibleAndFileAlreadyExistReturnsFalse(): void
+	{
+		$downloader = $this
+			->getMockBuilder( Downloader::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $downloader
-            ->expects($this->once())
-            ->method('isAccessible')
-            ->willReturn(true);
+		$downloader
+			->expects( $this->once() )
+			->method( 'isAccessible' )
+			->willReturn( true );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('getDownloader')
-            ->willReturn($downloader);
+		$this->helper
+			->expects( $this->once() )
+			->method( 'getDownloader' )
+			->willReturn( $downloader );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('isFileAlreadyExist')
-            ->willReturn(true);
+		$this->helper
+			->expects( $this->once() )
+			->method( 'isFileAlreadyExist' )
+			->willReturn( true );
 
-        $tool = $this
-            ->getMockBuilder(Tool::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+		$tool = $this
+			->getMockBuilder( Tool::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $decision = new FileAlreadyExistDecision($this->configuration, $this->helper);
-        $this->assertFalse($decision->canProceed($tool));
-    }
+		$decision = new FileAlreadyExistDecision( $this->configuration, $this->helper );
+		$this->assertFalse( $decision->canProceed( $tool ) );
+	}
 
-    public function testIfFileNotAccessibleAndFileAlreadyExistReturnsFalse()
-    {
-        $downloader = $this
-            ->getMockBuilder(Downloader::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+	public function testIfFileNotAccessibleAndFileAlreadyExistReturnsFalse(): void
+	{
+		$downloader = $this
+			->getMockBuilder( Downloader::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $downloader
-            ->expects($this->once())
-            ->method('isAccessible')
-            ->willReturn(false);
+		$downloader
+			->expects( $this->once() )
+			->method( 'isAccessible' )
+			->willReturn( false );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('getDownloader')
-            ->willReturn($downloader);
+		$this->helper
+			->expects( $this->once() )
+			->method( 'getDownloader' )
+			->willReturn( $downloader );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('isFileAlreadyExist')
-            ->willReturn(true);
+		$this->helper
+			->expects( $this->once() )
+			->method( 'isFileAlreadyExist' )
+			->willReturn( true );
 
-        $tool = $this
-            ->getMockBuilder(Tool::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+		$tool = $this
+			->getMockBuilder( Tool::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $decision = new FileAlreadyExistDecision($this->configuration, $this->helper);
-        $this->assertFalse($decision->canProceed($tool));
-    }
+		$decision = new FileAlreadyExistDecision( $this->configuration, $this->helper );
+		$this->assertFalse( $decision->canProceed( $tool ) );
+	}
 
-    public function testCanGetReason()
-    {
-        $decision = new FileAlreadyExistDecision($this->configuration, $this->helper);
-        $this->assertRegExp('/info/', $decision->getReason());
-    }
+	public function testCanGetReason(): void
+	{
+		$decision = new FileAlreadyExistDecision( $this->configuration, $this->helper );
+		$this->assertMatchesRegularExpression( '/info/', $decision->getReason() );
+	}
 }

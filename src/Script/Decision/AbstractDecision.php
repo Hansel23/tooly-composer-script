@@ -1,33 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Script\Decision;
+namespace Hansel23\Tooly\Script\Decision;
 
-use Tooly\Script\Configuration;
-use Tooly\Script\Decision\DecisionInterface;
-use Tooly\Script\Helper;
+use Hansel23\Tooly\Script\Configuration;
+use Hansel23\Tooly\Script\Helper;
 
-/**
- * @package Tooly\Script\Decision
- */
 abstract class AbstractDecision implements DecisionInterface
 {
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
+	protected Configuration $configuration;
 
-    /**
-     * @var Helper
-     */
-    protected $helper;
+	protected Helper        $helper;
 
-    /**
-     * @param Configuration $configuration
-     * @param Helper        $helper
-     */
-    public function __construct(Configuration $configuration, Helper $helper)
-    {
-        $this->configuration = $configuration;
-        $this->helper = $helper;
-    }
+	public function __construct( Configuration $configuration, Helper $helper )
+	{
+		$this->configuration = $configuration;
+		$this->helper        = $helper;
+	}
 }

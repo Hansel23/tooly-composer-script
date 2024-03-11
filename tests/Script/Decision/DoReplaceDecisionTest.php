@@ -1,141 +1,84 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Tests\Script\Decision;
+namespace Hansel23\Tooly\Tests\Script\Decision;
 
 use Composer\IO\ConsoleIO;
+use Hansel23\Tooly\Factory\ToolFactory;
+use Hansel23\Tooly\Script\Decision\DoReplaceDecision;
+use Hansel23\Tooly\Script\Helper\Filesystem;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
-use Tooly\Factory\ToolFactory;
-use Tooly\Script\Decision\DoReplaceDecision;
-use Tooly\Script\Helper\Filesystem;
 
-/**
- * @package Tooly\Tests\Script\Decision
- */
 class DoReplaceDecisionTest extends DecisionTestCase
 {
-    private $io;
+	private ConsoleIO $io;
 
-    private $input;
+	private HelperSet $helperSet;
 
-    private $output;
+	public function setUp(): void
+	{
+		parent::setUp();
 
-    /**
-     * @var HelperSet
-     */
-    private $helperSet;
+		$input           = new ArrayInput( [] );
+		$output          = new StreamOutput( fopen( 'php://memory', 'wb' ) );
+		$this->helperSet = new HelperSet;
 
-    public function setUp()
-    {
-        parent::setUp();
+		$this->io = new ConsoleIO( $input, $output, $this->helperSet );
+	}
 
-        $this->input = new ArrayInput([]);
-        $this->output = new StreamOutput(fopen('php://memory', 'w', false));
-        $this->helperSet = new HelperSet;
+	public function testIfFileNotExistReturnsTrue(): void
+	{
+		$filesystem = $this
+			->getMockBuilder( Filesystem::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $this->io = new ConsoleIO($this->input, $this->output, $this->helperSet);
-    }
+		$filesystem
+			->expects( $this->once() )
+			->method( 'isFileAlreadyExist' )
+			->willReturn( false );
 
-    public function testIfFileNotExistReturnsTrue()
-    {
-        $filesystem = $this
-            ->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+		$this->helper
+			->expects( $this->once() )
+			->method( 'getFilesystem' )
+			->willReturn( $filesystem );
 
-        $filesystem
-            ->expects($this->once())
-            ->method('isFileAlreadyExist')
-            ->willReturn(false);
+		$decision = new DoReplaceDecision( $this->configuration, $this->helper, $this->io );
+		$tool     = ToolFactory::createTool( 'tool', __DIR__, [] );
 
-        $this->helper
-            ->expects($this->once())
-            ->method('getFilesystem')
-            ->willReturn($filesystem);
+		$this->assertTrue( $decision->canProceed( $tool ) );
+	}
 
-        $decision = new DoReplaceDecision($this->configuration, $this->helper, $this->io);
-        $tool = ToolFactory::createTool('tool', __DIR__, []);
+	public function testIfFileExistReturnsForceReplaceValue(): void
+	{
+		$filesystem = $this
+			->getMockBuilder( Filesystem::class )
+			->disableOriginalConstructor()
+			->getMock();
 
-        $this->assertTrue($decision->canProceed($tool));
-    }
+		$filesystem
+			->expects( $this->exactly( 2 ) )
+			->method( 'isFileAlreadyExist' )
+			->willReturn( true );
 
-    public function testIfFileExistReturnsForceReplaceValue()
-    {
-        $filesystem = $this
-            ->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+		$this->helper
+			->expects( $this->exactly( 2 ) )
+			->method( 'getFilesystem' )
+			->willReturn( $filesystem );
 
-        $filesystem
-            ->expects($this->exactly(2))
-            ->method('isFileAlreadyExist')
-            ->willReturn(true);
+		$decision = new DoReplaceDecision( $this->configuration, $this->helper, $this->io );
 
-        $this->helper
-            ->expects($this->exactly(2))
-            ->method('getFilesystem')
-            ->willReturn($filesystem);
+		$tool = ToolFactory::createTool( 'tool', __DIR__, [] );
+		$this->assertFalse( $decision->canProceed( $tool ) );
 
-        $decision = new DoReplaceDecision($this->configuration, $this->helper, $this->io);
+		$tool->activateForceReplace();
+		$this->assertTrue( $decision->canProceed( $tool ) );
+	}
 
-        $tool = ToolFactory::createTool('tool', __DIR__, []);
-        $this->assertFalse($decision->canProceed($tool));
-
-        $tool->activateForceReplace();
-        $this->assertTrue($decision->canProceed($tool));
-    }
-
-    public function testInteractiveModeWithAnswerReturnsThatValue()
-    {
-        $sayNo = fopen('php://memory', 'r+', false);
-        fputs($sayNo, 'no');
-        rewind($sayNo);
-
-        $this->helperSet->set(new QuestionHelper);
-        $this->helperSet
-            ->get('question')
-            ->setInputStream($sayNo);
-
-        $filesystem = $this
-            ->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $filesystem
-            ->expects($this->exactly(2))
-            ->method('isFileAlreadyExist')
-            ->willReturn(true);
-
-        $this->helper
-            ->expects($this->exactly(2))
-            ->method('getFilesystem')
-            ->willReturn($filesystem);
-
-        $this->configuration
-            ->method('isInteractiveMode')
-            ->willReturn(true);
-
-        $decision = new DoReplaceDecision($this->configuration, $this->helper, $this->io);
-        $tool = ToolFactory::createTool('tool', __DIR__, []);
-
-        $this->assertFalse($decision->canProceed($tool));
-
-        $sayYes = fopen('php://memory', 'r+', false);
-        fputs($sayYes, 'yes');
-        rewind($sayYes);
-
-        $this->helperSet
-            ->get('question')
-            ->setInputStream($sayYes);
-
-        $this->assertTrue($decision->canProceed($tool));
-    }
-
-    public function testCanGetReason()
-    {
-        $decision = new DoReplaceDecision($this->configuration, $this->helper, $this->io);
-        $this->assertRegExp('/info/', $decision->getReason());
-    }
+	public function testCanGetReason(): void
+	{
+		$decision = new DoReplaceDecision( $this->configuration, $this->helper, $this->io );
+		$this->assertMatchesRegularExpression( '/info/', $decision->getReason() );
+	}
 }

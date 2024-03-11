@@ -1,90 +1,56 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Script;
+namespace Hansel23\Tooly\Script;
 
 use Composer\Composer;
-use Tooly\Factory\ToolFactory;
+use Hansel23\Tooly\Factory\ToolFactory;
 
-/**
- * @package Tooly\Script
- */
 class Configuration
 {
-    /**
-     * @var array
-     */
-    private $data = [];
+	private array  $data = [];
 
-    /**
-     * @var string
-     */
-    private $binDirectory;
+	private string $binDirectory;
 
-    /**
-     * @var string
-     */
-    private $composerBinDirectory;
+	private string $composerBinDirectory;
 
-    /**
-     * @var Mode
-     */
-    private $mode;
+	private Mode   $mode;
 
-    /**
-     * @param Composer $composer
-     * @param Mode     $mode
-     */
-    public function __construct(Composer $composer, Mode $mode)
-    {
-        $extras = $composer->getPackage()->getExtra();
+	public function __construct( Composer $composer, Mode $mode )
+	{
+		$extras = $composer->getPackage()->getExtra();
 
-        if (true === array_key_exists('tools', $extras)) {
-            $this->data = array_merge([], $extras['tools']);
-        }
+		if ( true === array_key_exists( 'tools', $extras ) )
+		{
+			$this->data = array_merge( [], $extras['tools'] );
+		}
 
-        $this->mode = $mode;
-        $this->binDirectory = realpath(__DIR__ . '/../../bin');
-        $this->composerBinDirectory = $composer->getConfig()->get('bin-dir');
-    }
+		$this->mode                 = $mode;
+		$this->binDirectory         = dirname( __DIR__, 2 ) . '/bin';
+		$this->composerBinDirectory = $composer->getConfig()->get( 'bin-dir' );
+	}
 
-    /**
-     * @return bool
-     */
-    public function isDevMode()
-    {
-        return $this->mode->isDev();
-    }
+	public function isDevMode(): bool
+	{
+		return $this->mode->isDev();
+	}
 
-    /**
-     * @return bool
-     */
-    public function isInteractiveMode()
-    {
-        return $this->mode->isInteractive();
-    }
+	public function isInteractiveMode(): bool
+	{
+		return $this->mode->isInteractive();
+	}
 
-    /**
-     * @return string
-     */
-    public function getBinDirectory()
-    {
-        return $this->binDirectory;
-    }
+	public function getBinDirectory(): string
+	{
+		return $this->binDirectory;
+	}
 
-    /**
-     * @return string
-     */
-    public function getComposerBinDirectory()
-    {
-        return $this->composerBinDirectory;
-    }
+	public function getComposerBinDirectory(): string
+	{
+		return $this->composerBinDirectory;
+	}
 
-    /**
-     * @return array
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function getTools()
-    {
-        return ToolFactory::createTools($this->binDirectory, $this->data);
-    }
+	public function getTools(): array
+	{
+		return ToolFactory::createTools( $this->binDirectory, $this->data );
+	}
 }

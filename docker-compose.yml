@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .docker/php
+    container_name: tooly_repo
+    restart: "no"
+    working_dir: /repo
+    volumes:
+      - ./:/repo

@@ -1,55 +1,46 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Script;
+namespace Hansel23\Tooly\Script;
 
-/**
- * @package Tooly\Script
- */
 class Mode
 {
-    /**
-     * @var bool
-     */
-    private $isDev = true;
+	private bool $isDev         = true;
 
-    /**
-     * @var bool
-     */
-    private $isInteractive = true;
+	private bool $isInteractive = true;
 
-    /**
-     * Set flag for composer dev-mode to false.
-     */
-    public function setNoDev()
-    {
-        $this->isDev = false;
-    }
+	/**
+	 * Set flag for composer dev-mode to false.
+	 */
+	public function setNoDev(): void
+	{
+		$this->isDev = false;
+	}
 
-    /**
-     * Set flag for CLI interaction to false.
-     */
-    public function setNonInteractive()
-    {
-        $this->isInteractive = false;
-    }
+	/**
+	 * Set flag for CLI interaction to false.
+	 */
+	public function setNonInteractive(): void
+	{
+		$this->isInteractive = false;
+	}
 
-    /**
-     * Returns if composer runs in dev-mode.
-     *
-     * @return bool
-     */
-    public function isDev()
-    {
-        return $this->isDev;
-    }
+	/**
+	 * Returns if composer runs in dev-mode.
+	 *
+	 * @return bool
+	 */
+	public function isDev(): bool
+	{
+		return $this->isDev;
+	}
 
-    /**
-     * Returns if the CLI can interact.
-     *
-     * @return bool
-     */
-    public function isInteractive()
-    {
-        return $this->isInteractive;
-    }
+	/**
+	 * Returns if the CLI can interact.
+	 *
+	 * @return bool
+	 */
+	public function isInteractive(): bool
+	{
+		return $this->isInteractive;
+	}
 }

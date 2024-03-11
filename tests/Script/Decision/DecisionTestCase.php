@@ -1,29 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Tests\Script\Decision;
+namespace Hansel23\Tooly\Tests\Script\Decision;
 
-use Tooly\Script\Configuration;
-use Tooly\Script\Helper;
+use Hansel23\Tooly\Script\Configuration;
+use Hansel23\Tooly\Script\Helper;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @package Tooly\Tests\Script\Decision
- */
-abstract class DecisionTestCase extends \PHPUnit_Framework_TestCase
+abstract class DecisionTestCase extends TestCase
 {
-    protected $helper;
+	protected Helper|\PHPUnit\Framework\MockObject\MockObject        $helper;
 
-    protected $configuration;
+	protected Configuration|\PHPUnit\Framework\MockObject\MockObject $configuration;
 
-    public function setUp()
-    {
-        $this->helper = $this
-            ->getMockBuilder(Helper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+	public function setUp(): void
+	{
+		$this->helper = $this->getMockBuilder( Helper::class )
+		                     ->disableOriginalConstructor()
+		                     ->getMock();
 
-        $this->configuration = $this
-            ->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
+		$this->configuration = $this->getMockBuilder( Configuration::class )
+		                            ->disableOriginalConstructor()
+		                            ->getMock();
+	}
 }

@@ -1,32 +1,27 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Tests\Script\Helper;
+namespace Hansel23\Tooly\Tests\Script\Helper;
 
-use phpmock\phpunit\PHPMock;
-use Tooly\Script\Helper\Downloader;
+use Hansel23\Tooly\Script\Helper\Downloader;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @package Tooly\Tests\Script\Helper
- */
-class DownloaderTest extends \PHPUnit_Framework_TestCase
+class DownloaderTest extends TestCase
 {
-    use PHPMock;
+	public function testAccessibleTestWorksCorrect(): void
+	{
+		$downloader = new Downloader;
 
-    public function testAccessibleTestWorksCorrect()
-    {
-        $downloader = new Downloader;
+		$this->assertFalse( $downloader->isAccessible( 'foo' ) );
+		$this->assertTrue( $downloader->isAccessible( 'https://google.com' ) );
+	}
 
-        $this->assertFalse($downloader->isAccessible('foo'));
-        $this->assertTrue($downloader->isAccessible('https://github.com/tommy-muehle/tooly-composer-script/blob/master/README.md'));
-    }
+	public function testCanDownloadContentFromUrl(): void
+	{
+		$downloader = new Downloader;
 
-    public function testCanDownloadContentFromUrl()
-    {
-        $downloader = new Downloader;
-
-        $this->assertRegExp(
-            '/tooly-composer-script/',
-            $downloader->download('https://github.com/tommy-muehle/tooly-composer-script/blob/master/README.md')
-        );
-    }
+		$this->assertMatchesRegularExpression(
+			'/google/',
+			$downloader->download( 'https://google.com' )
+		);
+	}
 }

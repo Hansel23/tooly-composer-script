@@ -1,132 +1,88 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Script\Helper;
+namespace Hansel23\Tooly\Script\Helper;
 
 use Composer\Util\Filesystem as ComposerFileSystem;
 use Composer\Util\Silencer;
 
-/**
- * @package Tooly\Script\Helper
- */
 class Filesystem
 {
-    /**
-     * @var ComposerFileSystem
-     */
-    private $filesystem;
+	private ComposerFileSystem $filesystem;
 
-    /**
-     * @param ComposerFileSystem|null $filesystem
-     */
-    public function __construct(ComposerFileSystem $filesystem = null)
-    {
-        $this->filesystem = $filesystem ?: new ComposerFileSystem();
-    }
+	public function __construct( ?ComposerFileSystem $filesystem = null )
+	{
+		$this->filesystem = $filesystem ? : new ComposerFileSystem();
+	}
 
-    /**
-     * @param string $filename
-     *
-     * @return bool
-     */
-    public function isFileAlreadyExist($filename)
-    {
-        return file_exists($filename);
-    }
+	public function isFileAlreadyExist( string $filename ): bool
+	{
+		return file_exists( $filename );
+	}
 
-    /**
-     * @param string $filename
-     * @param string $content
-     *
-     * @return bool
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function createFile($filename, $content)
-    {
-        if (false === $this->createDirectory(dirname($filename))) {
-            return false;
-        }
+	public function createFile( string $filename, string $content ): bool
+	{
+		if ( false === $this->createDirectory( dirname( $filename ) ) )
+		{
+			return false;
+		}
 
-        Silencer::call('file_put_contents', $filename, $content);
-        Silencer::call('chmod', $filename, 0755);
+		Silencer::call( 'file_put_contents', $filename, $content );
+		Silencer::call( 'chmod', $filename, 0755 );
 
-        return true;
-    }
+		return true;
+	}
 
-    /**
-     * @param string $sourceFile
-     * @param string $file
-     *
-     * @return bool
-     */
-    public function symlinkFile($sourceFile, $file)
-    {
-        if (false === $this->createDirectory(dirname($file))) {
-            return false;
-        }
+	public function symlinkFile( string $sourceFile, string $file ): bool
+	{
+		if ( false === $this->createDirectory( dirname( $file ) ) )
+		{
+			return false;
+		}
 
-        if (true === $this->isFileAlreadyExist($file)) {
-            return true;
-        }
+		if ( true === $this->isFileAlreadyExist( $file ) )
+		{
+			return true;
+		}
 
-        return $this->filesystem->relativeSymlink($sourceFile, $file);
-    }
+		return $this->filesystem->relativeSymlink( $sourceFile, $file );
+	}
 
-    /**
-     * @param $sourceFile
-     * @param $file
-     *
-     * @return bool
-     */
-    public function copyFile($sourceFile, $file)
-    {
-        if (!$this->createDirectory(dirname($file))) {
-            return false;
-        }
+	public function copyFile( string $sourceFile, string $file ): bool
+	{
+		if ( !$this->createDirectory( dirname( $file ) ) )
+		{
+			return false;
+		}
 
-        if ($this->isFileAlreadyExist($file)) {
-            return true;
-        }
+		if ( $this->isFileAlreadyExist( $file ) )
+		{
+			return true;
+		}
 
-        return Silencer::call(
-            'copy',
-            $this->filesystem->normalizePath($sourceFile),
-            $this->filesystem->normalizePath($file)
-        );
-    }
+		return Silencer::call(
+			'copy',
+			$this->filesystem->normalizePath( $sourceFile ),
+			$this->filesystem->normalizePath( $file )
+		);
+	}
 
-    /**
-     * @param string $directory
-     *
-     * @return bool
-     */
-    public function removeDirectory($directory)
-    {
-        return $this->filesystem->removeDirectoryPhp($directory);
-    }
+	public function removeDirectory( string $directory ): bool
+	{
+		return $this->filesystem->removeDirectoryPhp( $directory );
+	}
 
-    /**
-     * @param string $file
-     *
-     * @return bool
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function remove($file)
-    {
-        return Silencer::call('unlink', $file);
-    }
+	public function remove( string $file ): bool
+	{
+		return Silencer::call( 'unlink', $file );
+	}
 
-    /**
-     * @param string $directory
-     *
-     * @return bool
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function createDirectory($directory)
-    {
-        if (true === is_dir($directory)) {
-            return true;
-        }
+	public function createDirectory( string $directory ): bool
+	{
+		if ( true === is_dir( $directory ) )
+		{
+			return true;
+		}
 
-        return Silencer::call('mkdir', $directory, 0777, true);
-    }
+		return Silencer::call( 'mkdir', $directory, 0777, true );
+	}
 }

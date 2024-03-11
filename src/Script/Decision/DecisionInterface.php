@@ -1,23 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Script\Decision;
+namespace Hansel23\Tooly\Script\Decision;
 
-use Tooly\Model\Tool;
+use Hansel23\Tooly\Model\Tool;
 
-/**
- * @package Tooly\Script\Decision
- */
 interface DecisionInterface
 {
-    /**
-     * @param Tool $tool
-     *
-     * @return bool
-     */
-    public function canProceed(Tool $tool);
+	public function canProceed( Tool $tool ): bool;
 
-    /**
-     * @return string
-     */
-    public function getReason();
+	public function getReason(): string;
 }

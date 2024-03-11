@@ -1,162 +1,90 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Model;
+namespace Hansel23\Tooly\Model;
 
-/**
- * @package Tooly\Model
- */
 class Tool
 {
-    /**
-     * @var string
-     */
-    private $name;
+	private string  $name;
 
-    /**
-     * @var string
-     */
-    private $filename;
+	private string  $filename;
 
-    /**
-     * @var string
-     */
-    private $url;
+	private string  $url;
 
-    /**
-     * @var string
-     */
-    private $signUrl;
+	private ?string $signUrl;
 
-    /**
-     * @var bool
-     */
-    private $forceReplace = false;
+	private bool    $forceReplace = false;
 
-    /**
-     * @var bool
-     */
-    private $onlyDev = true;
+	private bool    $onlyDev      = true;
 
-    /**
-     * @var bool
-     */
-    private $rename = false;
+	private bool    $rename       = false;
 
-    /**
-     * @var string
-     */
-    private $fallbackUrl;
+	private string  $fallbackUrl  = '';
 
-    /**
-     * @param string $name
-     * @param string $filename
-     * @param string $url
-     * @param string $signUrl
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
-     */
-    public function __construct($name, $filename, $url, $signUrl = null)
-    {
-        $this->name = $name;
-        $this->filename = $filename;
-        $this->url = $url;
-        $this->signUrl = $signUrl;
-    }
+	public function __construct( string $name, string $filename, string $url, ?string $signUrl = null )
+	{
+		$this->name     = $name;
+		$this->filename = $filename;
+		$this->url      = $url;
+		$this->signUrl  = $signUrl;
+	}
 
-    /**
-     * @return void
-     */
-    public function activateForceReplace()
-    {
-        $this->forceReplace = true;
-    }
+	public function activateForceReplace(): void
+	{
+		$this->forceReplace = true;
+	}
 
-    /**
-     * @return void
-     */
-    public function disableOnlyDev()
-    {
-        $this->onlyDev = false;
-    }
+	public function disableOnlyDev(): void
+	{
+		$this->onlyDev = false;
+	}
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
+	public function getName(): string
+	{
+		return $this->name;
+	}
 
-    /**
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->filename;
-    }
+	public function getFilename(): string
+	{
+		return $this->filename;
+	}
 
-    /**
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->url;
-    }
+	public function getUrl(): string
+	{
+		return $this->url;
+	}
 
-    /**
-     * @return string
-     */
-    public function getSignUrl()
-    {
-        return $this->signUrl;
-    }
+	public function getSignUrl(): ?string
+	{
+		return $this->signUrl;
+	}
 
-    /**
-     * @return boolean
-     */
-    public function isOnlyDev()
-    {
-        return $this->onlyDev;
-    }
+	public function isOnlyDev(): bool
+	{
+		return $this->onlyDev;
+	}
 
-    /**
-     * @return bool
-     */
-    public function forceReplace()
-    {
-        return $this->forceReplace;
-    }
+	public function forceReplace(): bool
+	{
+		return $this->forceReplace;
+	}
 
-    /**
-     * @return void
-     */
-    public function setNameToToolKey()
-    {
-        $this->rename = true;
-    }
+	public function setNameToToolKey(): void
+	{
+		$this->rename = true;
+	}
 
-    /**
-     * @return bool
-     */
-    public function renameToConfigKey()
-    {
-        return $this->rename;
-    }
+	public function renameToConfigKey(): bool
+	{
+		return $this->rename;
+	}
 
-    /**
-     * @param string $url
-     *
-     * @return void
-     */
-    public function setFallbackUrl($url)
-    {
-        $this->fallbackUrl = $url;
-    }
+	public function setFallbackUrl( string $url ): void
+	{
+		$this->fallbackUrl = $url;
+	}
 
-    /**
-     * @return string
-     */
-    public function getFallbackUrl()
-    {
-        return $this->fallbackUrl;
-    }
+	public function getFallbackUrl(): string
+	{
+		return $this->fallbackUrl;
+	}
 }

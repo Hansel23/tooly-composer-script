@@ -1,65 +1,50 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Script\Decision;
+namespace Hansel23\Tooly\Script\Decision;
 
 use Composer\IO\IOInterface;
-use Tooly\Model\Tool;
-use Tooly\Script\Configuration;
-use Tooly\Script\Helper;
+use Hansel23\Tooly\Model\Tool;
+use Hansel23\Tooly\Script\Configuration;
+use Hansel23\Tooly\Script\Helper;
 
-/**
- * @package Tooly\Script\Decision
- */
 class DoReplaceDecision extends AbstractDecision
 {
-    /**
-     * @var IOInterface
-     */
-    private $io;
+	private IOInterface $io;
 
-    /**
-     * DoReplaceDecision constructor.
-     * @param Configuration $configuration
-     * @param Helper $helper
-     */
-    public function __construct(Configuration $configuration, Helper $helper, IOInterface $io)
-    {
-        $this->io = $io;
+	public function __construct( Configuration $configuration, Helper $helper, IOInterface $io )
+	{
+		$this->io = $io;
 
-        parent::__construct($configuration, $helper);
-    }
+		parent::__construct( $configuration, $helper );
+	}
 
-    /**
-     * @param Tool $tool
-     *
-     * @return bool
-     */
-    public function canProceed(Tool $tool)
-    {
-        if (false === $this->helper->getFilesystem()->isFileAlreadyExist($tool->getFilename())) {
-            return true;
-        }
+	public function canProceed( Tool $tool ): bool
+	{
+		if ( false === $this->helper->getFilesystem()->isFileAlreadyExist( $tool->getFilename() ) )
+		{
+			return true;
+		}
 
-        $doReplace = $tool->forceReplace();
+		$doReplace = $tool->forceReplace();
 
-        if (true === $this->configuration->isInteractiveMode()) {
-            $this->io->write('<comment>Checksums are not equal!</comment>');
-            $this->io->write(sprintf(
-                '<comment>Do you want to overwrite the existing file "%s"?</comment>',
-                $tool->getName()
-            ));
+		if ( true === $this->configuration->isInteractiveMode() )
+		{
+			$this->io->write( '<comment>Checksums are not equal!</comment>' );
+			$this->io->write(
+				sprintf(
+					'<comment>Do you want to overwrite the existing file "%s"?</comment>',
+					$tool->getName()
+				)
+			);
 
-            $doReplace = $this->io->askConfirmation('<question>[yes] or [no]?</question>', false);
-        }
+			$doReplace = $this->io->askConfirmation( '<question>[yes] or [no]?</question>', false );
+		}
 
-        return $doReplace;
-    }
+		return $doReplace;
+	}
 
-    /**
-     * @return string
-     */
-    public function getReason()
-    {
-        return '<info>No replace selected. Skipped.</info>';
-    }
+	public function getReason(): string
+	{
+		return '<info>No replace selected. Skipped.</info>';
+	}
 }

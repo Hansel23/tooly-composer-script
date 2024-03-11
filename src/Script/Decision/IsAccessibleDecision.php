@@ -1,53 +1,40 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Script\Decision;
+namespace Hansel23\Tooly\Script\Decision;
 
-use Tooly\Model\Tool;
+use Hansel23\Tooly\Model\Tool;
 
-/**
- * @package Tooly\Script\Decision
- */
 class IsAccessibleDecision extends AbstractDecision
 {
-    /**
-     * @param Tool $tool
-     *
-     * @return bool
-     */
-    public function canProceed(Tool $tool)
-    {
-        if (false === $this->helper->getDownloader()->isAccessible($tool->getUrl())) {
-            return $this->fallbackUrlIsAccessible($tool);
-        }
+	public function canProceed( Tool $tool ): bool
+	{
+		if ( false === $this->helper->getDownloader()->isAccessible( $tool->getUrl() ) )
+		{
+			return $this->fallbackUrlIsAccessible( $tool );
+		}
 
-        if (empty($tool->getSignUrl())) {
-            return true;
-        }
+		if ( empty( $tool->getSignUrl() ) )
+		{
+			return true;
+		}
 
-        if (false === $this->helper->getDownloader()->isAccessible($tool->getSignUrl())) {
-            return false;
-        }
+		if ( false === $this->helper->getDownloader()->isAccessible( $tool->getSignUrl() ) )
+		{
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    /**
-     * @return string
-     */
-    public function getReason()
-    {
-        return '<error>At least one given URL are not accessible!</error>';
-    }
+	public function getReason(): string
+	{
+		return '<error>At least one given URL are not accessible!</error>';
+	}
 
-    /**
-     * @param Tool $tool
-     *
-     * @return bool
-     */
-    private function fallbackUrlIsAccessible(Tool $tool)
-    {
-        $fallbackUrl = $tool->getFallbackUrl();
+	private function fallbackUrlIsAccessible( Tool $tool ): bool
+	{
+		$fallbackUrl = $tool->getFallbackUrl();
 
-        return false === empty($fallbackUrl) && true === $this->helper->getDownloader()->isAccessible($fallbackUrl);
-    }
+		return false === empty( $fallbackUrl ) && true === $this->helper->getDownloader()->isAccessible( $fallbackUrl );
+	}
 }

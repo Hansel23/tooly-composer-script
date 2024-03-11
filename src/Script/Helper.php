@@ -1,107 +1,65 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Script;
+namespace Hansel23\Tooly\Script;
 
-use Tooly\Script\Helper\Verifier;
-use Tooly\Script\Helper\Downloader;
-use Tooly\Script\Helper\Filesystem;
+use Hansel23\Tooly\Script\Helper\Downloader;
+use Hansel23\Tooly\Script\Helper\Filesystem;
+use Hansel23\Tooly\Script\Helper\Verifier;
 
-/**
- * @package Tooly\Script
- */
 class Helper
 {
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+	private Filesystem $filesystem;
 
-    /**
-     * @var Downloader
-     */
-    private $downloader;
+	private Downloader $downloader;
 
-    /**
-     * @var Verifier
-     */
-    private $verifier;
+	private Verifier   $verifier;
 
-    /**
-     * @param Filesystem $filesystem
-     * @param Downloader $downloader
-     * @param Verifier   $verifier
-     */
-    public function __construct(Filesystem $filesystem, Downloader $downloader, Verifier $verifier)
-    {
-        $this->filesystem = $filesystem;
-        $this->downloader = $downloader;
-        $this->verifier   = $verifier;
-    }
+	public function __construct( Filesystem $filesystem, Downloader $downloader, Verifier $verifier )
+	{
+		$this->filesystem = $filesystem;
+		$this->downloader = $downloader;
+		$this->verifier   = $verifier;
+	}
 
-    /**
-     * @param string $filename
-     * @param string $targetFile
-     *
-     * @return bool
-     */
-    public function isFileAlreadyExist($filename, $targetFile)
-    {
-        $alreadyExist = $this->filesystem->isFileAlreadyExist($filename);
-        $verification = $this->verifier->checkFileSum($filename, $targetFile);
+	public function isFileAlreadyExist( string $filename, string $targetFile ): bool
+	{
+		$alreadyExist = $this->filesystem->isFileAlreadyExist( $filename );
+		$verification = $this->verifier->checkFileSum( $filename, $targetFile );
 
-        if (true === $alreadyExist && true === $verification) {
-            return true;
-        }
+		return true === $alreadyExist && true === $verification;
+	}
 
-        return false;
-    }
+	public function isVerified( string $signatureUrl, string $fileUrl ): bool
+	{
+		$data          = $this->downloader->download( $fileUrl );
+		$signatureData = $this->downloader->download( $signatureUrl );
 
-    /**
-     * @param string $signatureUrl
-     * @param string $fileUrl
-     *
-     * @return bool
-     */
-    public function isVerified($signatureUrl, $fileUrl)
-    {
-        $data = $this->downloader->download($fileUrl);
-        $signatureData = $this->downloader->download($signatureUrl);
+		$tmpFile = rtrim( sys_get_temp_dir(), '/' ) . '/_tool';
+		$this->filesystem->createFile( $tmpFile, $data );
 
-        $tmpFile = rtrim(sys_get_temp_dir(), '/') . '/_tool';
-        $this->filesystem->createFile($tmpFile, $data);
+		$tmpSignFile = rtrim( sys_get_temp_dir(), '/' ) . '/_tool.sign';
+		$this->filesystem->createFile( $tmpSignFile, $signatureData );
 
-        $tmpSignFile = rtrim(sys_get_temp_dir(), '/') . '/_tool.sign';
-        $this->filesystem->createFile($tmpSignFile, $signatureData);
+		$result = $this->verifier->checkGPGSignature( $tmpSignFile, $tmpFile );
 
-        $result = $this->verifier->checkGPGSignature($tmpSignFile, $tmpFile);
+		unlink( $tmpFile );
+		unlink( $tmpSignFile );
 
-        unlink($tmpFile);
-        unlink($tmpSignFile);
+		return $result;
+	}
 
-        return $result;
-    }
+	public function getFilesystem(): Filesystem
+	{
+		return $this->filesystem;
+	}
 
-    /**
-     * @return Filesystem
-     */
-    public function getFilesystem()
-    {
-        return $this->filesystem;
-    }
+	public function getDownloader(): Downloader
+	{
+		return $this->downloader;
+	}
 
-    /**
-     * @return Downloader
-     */
-    public function getDownloader()
-    {
-        return $this->downloader;
-    }
-
-    /**
-     * @return Verifier
-     */
-    public function getVerifier()
-    {
-        return $this->verifier;
-    }
+	public function getVerifier(): Verifier
+	{
+		return $this->verifier;
+	}
 }

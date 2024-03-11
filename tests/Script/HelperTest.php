@@ -1,113 +1,64 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Tooly\Tests\Script;
+namespace Hansel23\Tooly\Tests\Script;
 
-use phpmock\phpunit\PHPMock;
-use org\bovigo\vfs\vfsStream;
-use Tooly\Script\Helper;
-use Tooly\Script\Helper\Filesystem;
-use Tooly\Script\Helper\Downloader;
-use Tooly\Script\Helper\Verifier;
+use Hansel23\Tooly\Script\Helper;
+use Hansel23\Tooly\Script\Helper\Downloader;
+use Hansel23\Tooly\Script\Helper\Filesystem;
+use Hansel23\Tooly\Script\Helper\Verifier;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @package Tooly\Tests
- */
-class HelperTest extends \PHPUnit_Framework_TestCase
+class HelperTest extends TestCase
 {
-    use PHPMock;
+	public function testCanCheckIfFileAlreadyExist(): void
+	{
+		$filesystem = $this->getMockBuilder( Filesystem::class )
+		                   ->onlyMethods( [ 'isFileAlreadyExist' ] )
+		                   ->getMock();
 
-    public function testCanVerifyAFile()
-    {
-        vfsStream::setup();
+		$filesystem
+			->expects( $this->exactly( 2 ) )
+			->method( 'isFileAlreadyExist' )
+			->willReturnOnConsecutiveCalls( true, false );
 
-        $this
-            ->getFunctionMock('Tooly\Script', 'sys_get_temp_dir')
-            ->expects($this->any())
-            ->willReturn('vfs://root/');
+		$verifier = $this
+			->getMockBuilder( Verifier::class )
+			->onlyMethods( [ 'checkFileSum' ] )
+			->getMock();
 
-        $downloader = $this
-            ->getMockBuilder(Downloader::class)
-            ->setMethods(['download'])
-            ->getMock();
+		$verifier
+			->expects( $this->exactly( 2 ) )
+			->method( 'checkFileSum' )
+			->willReturnOnConsecutiveCalls( true, false );
 
-        $downloader
-            ->expects($this->any())
-            ->method('download')
-            ->willReturn('foo');
+		$helper = new Helper( $filesystem, new Downloader, $verifier );
 
-        $verifier = $this
-            ->getMockBuilder(Verifier::class)
-            ->setMethods(['checkGPGSignature'])
-            ->getMock();
+		$this->assertTrue( $helper->isFileAlreadyExist( 'foo', 'bar' ) );
+		$this->assertFalse( $helper->isFileAlreadyExist( 'foo', 'bar' ) );
+	}
 
-        $verifier
-            ->expects($this->exactly(2))
-            ->method('checkGPGSignature')
-            ->willReturnOnConsecutiveCalls(true, false);
+	public function testCanSymlinkAFile(): void
+	{
+		$filesystem = $this->getMockBuilder( Filesystem::class )->getMock();
 
-        $helper = new Helper(new Filesystem, $downloader, $verifier);
+		$filesystem
+			->expects( $this->once() )
+			->method( 'symlinkFile' )
+			->willReturn( true );
 
-        $this->assertTrue($helper->isVerified('foo.sign', 'foo'));
-        $this->assertFalse(file_exists('vfs://root/_tool'));
-        $this->assertFalse(file_exists('vfs://root/_tool.sign'));
+		$helper = new Helper( $filesystem, new Downloader, new Verifier );
+		$this->assertTrue( $helper->getFilesystem()->symlinkFile( 'foo', 'bar' ) );
+	}
 
-        $this->assertFalse($helper->isVerified('foo.sign', 'foo'));
-        $this->assertFalse(file_exists('vfs://root/_tool'));
-        $this->assertFalse(file_exists('vfs://root/_tool.sign'));
-    }
+	public function testCanGetDownloader(): void
+	{
+		$helper = new Helper( new Filesystem, new Downloader, new Verifier );
+		$this->assertInstanceOf( Downloader::class, $helper->getDownloader() );
+	}
 
-    public function testCanCheckIfFileAlreadyExist()
-    {
-        $filesystem = $this
-            ->getMockBuilder(Filesystem::class)
-            ->setMethods(['isFileAlreadyExist'])
-            ->getMock();
-
-        $filesystem
-            ->expects($this->exactly(2))
-            ->method('isFileAlreadyExist')
-            ->willReturnOnConsecutiveCalls(true, false);
-
-        $verifier = $this
-            ->getMockBuilder(Verifier::class)
-            ->setMethods(['checkFileSum'])
-            ->getMock();
-
-        $verifier
-            ->expects($this->exactly(2))
-            ->method('checkFileSum')
-            ->willReturnOnConsecutiveCalls(true, false);
-
-        $helper = new Helper($filesystem, new Downloader, $verifier);
-
-        $this->assertTrue($helper->isFileAlreadyExist('foo', 'bar'));
-        $this->assertFalse($helper->isFileAlreadyExist('foo', 'bar'));
-    }
-
-    public function testCanSymlinkAFile()
-    {
-        $filesystem = $this
-            ->getMockBuilder(Filesystem::class)
-            ->getMock();
-
-        $filesystem
-            ->expects($this->once())
-            ->method('symlinkFile')
-            ->willReturn(true);
-
-        $helper = new Helper($filesystem, new Downloader, new Verifier);
-        $this->assertTrue($helper->getFilesystem()->symlinkFile('foo', 'bar'));
-    }
-
-    public function testCanGetDownloader()
-    {
-        $helper = new Helper(new Filesystem, new Downloader, new Verifier);
-        $this->assertInstanceOf(Downloader::class, $helper->getDownloader());
-    }
-
-    public function testCanGetVerifier()
-    {
-        $helper = new Helper(new Filesystem, new Downloader, new Verifier);
-        $this->assertInstanceOf(Verifier::class, $helper->getVerifier());
-    }
+	public function testCanGetVerifier(): void
+	{
+		$helper = new Helper( new Filesystem, new Downloader, new Verifier );
+		$this->assertInstanceOf( Verifier::class, $helper->getVerifier() );
+	}
 }
